@@ -1,4 +1,4 @@
-image: /home/supannee/Project/src/ALS_Final_Project/als_mobile_robot/map/cafe/map_cafe.pgm
+image: /home/chollatis/ros_ws/ALS_Project/src/ALS_Final_Project/als_mobile_robot/map/cafe/map_cafe.pgm
 resolution: 0.050000
 origin: [-1.642301, -11.961729, 0.000000]
 negate: 0

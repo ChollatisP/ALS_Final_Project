@@ -12,51 +12,54 @@
      <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher"></node>
 
 <!-- GAZEBO -->
-     <arg name="paused" default="false"/>
-     <arg name="use_sim_time" default="true"/>
-     <arg name="gui" default="true"/>
-     <arg name="headless" default="false"/>
-     <arg name="debug" default="false"/>
-     <arg name="gui_required" default="true"/>
-     <arg name="mesh_enabled" default="true"/>
-     <arg name="robot_namespace" default="/"/>
+<arg name="paused" default="false"/>
+<arg name="use_sim_time" default="true"/>
+<arg name="gui" default="false"/> <!-- Default to false to disable GUI -->
+<arg name="headless" default="true"/> <!-- Set to true for headless mode -->
+<arg name="debug" default="false"/>
+<arg name="gui_required" default="true"/>
+<arg name="mesh_enabled" default="true"/>
+<arg name="robot_namespace" default="/"/>
 
-    <include file="$(find gazebo_ros)/launch/empty_world.launch">
-        <arg name="world_name" value="/home/supannee/Project/src/ALS_Final_Project/als_mobile_robot/world/cafe" />
-        <arg name="paused" value="$(arg paused)"/>
-        <arg name="use_sim_time" value="$(arg use_sim_time)"/>
-        <arg name="gui" value="$(arg gui)"/>
-        <arg name="headless" value="$(arg headless)"/>
-        <arg name="debug" value="$(arg debug)"/>
-        <arg name="verbose" default="false"/>
-        <arg name="gui_required" value="$(arg gui_required)"/>
+<!-- Include Gazebo World with Headless Mode -->
+<include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find als_mobile_robot)/world/cafe" />
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+    <arg name="gui" value="false"/> <!-- Disable GUI for headless -->
+    <arg name="headless" value="true"/> <!-- Ensure headless mode is true -->
+    <arg name="debug" value="$(arg debug)"/>
+    <arg name="verbose" default="false"/>
+    <arg name="gui_required" value="$(arg gui_required)"/>
+</include>
 
-    </include>
+<group ns="$(arg robot_namespace)">
+    <!-- Load Robot Description -->
+    <param name="robot_description" command="$(find xacro)/xacro '$(find als_mobile_robot)/urdf/robot.urdf.xacro' --inorder mesh_enabled:=$(arg mesh_enabled)" />
 
-     <group ns="$(arg robot_namespace)">
+    <!-- Spawn Robot Model in Gazebo -->
+    <node name="ds_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-z 0.5 -urdf -param robot_description -model $(arg robot_namespace)" />
+
+    <!-- Load Controller Configuration -->
+    <rosparam command="load" file="$(find als_mobile_robot)/config/control_diff.yaml" />
+
+    <!-- Spawn Controllers -->
+    <node name="base_controller_spawner" pkg="controller_manager" type="spawner" args="joint_state_controller velocity_controller" />
+</group>
 
 
-        <param name="robot_description" command="$(find xacro)/xacro '$(find als_mobile_robot)/urdf/robot.urdf.xacro'
-            --inorder  mesh_enabled:=$(arg mesh_enabled)" />
-
-        <node name="ds_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="  -z 0.5 
-                        -urdf 
-                        -param robot_description 
-                        -model $(arg robot_namespace)" />
-
-
-        <rosparam command="load" file="$(find als_mobile_robot)/config/control_diff.yaml" />
-
-        <node name="base_controller_spawner" pkg="controller_manager" type="spawner" 
-                args="  joint_state_controller
-                        velocity_controller
-                                "/>
-    </group>
-
-     <node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0.0 0.0 0.0 map odom 100"/>
+     <node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0.0 0.0 0.0 odom map 100"/>
      <!-- <node pkg="tf" type="static_transform_publisher" name="odom_to_base" args="0.0 0.0 0.0 0.0 0.0 0.0 /odom base_link 100"/> -->
-     <node pkg="tf" type="static_transform_publisher" name="base_to_odom" args="0.1 0 0.2 0 0 0 /base_link /laser_frame 100"/> 
-     <!-- <node pkg="tf" type="static_transform_publisher" name="map_to_base" args="0 0 0 0 0 0 map /laser_frame 100""/>  -->
+     <!-- <node pkg="tf" type="static_transform_publisher" name="base_to_odom" args="0.1 0 0.2 0 0 0 /base_link /laser_frame 100"/>  -->
+          <node pkg="tf" type="static_transform_publisher" name="map_to_base" args="0 0 0 0 0 0 map /laser_frame 40"/> 
+          <!-- <node name="static_transform_publisher" pkg="tf" type="static_transform_publisher" args="0.1 0 0 0 0 0 base_link lidar_link 40"/> -->
+
+     <param name="scan_topic" value="/scan" />
+     <param name="base_frame" value="base_link" />
+     <param name="map_frame" value="map" />
+     <param name="max_iterations" value="10" />
+     <param name="angular_threshold" value="0.1" />
+     <node pkg="laser_scan_matcher" type="laser_scan_matcher_node" name="laser_scan_matcher" />
 
 <!-- mcl.launch -->
     <!-- ROS parameters -->
@@ -83,7 +86,7 @@
     <arg name="local_sdf_keypoints_name" default="/gl_local_sdf_keypoints" /> <!-- visualization_msgs::Marker -->
 
     <!-- TF frames -->
-     <arg name="laser_frame" default="laser" />
+     <arg name="laser_frame" default="laser_frame" />
      <arg name="base_link_frame" default="base_link" />
      <arg name="map_frame" default="map" />
      <arg name="odom_frame" default="odom" />
@@ -95,7 +98,7 @@
          In this MCL package, the numbers of the particles are constant. -->
     <arg name="particle_num" default="1000" />
 
-    <arg name="use_augmented_mcl" default="false" />
+    <arg name="use_augmented_mcl" default="true" />
     <arg name="alpha_slow" default="0.001" />
     <arg name="alpha_fast" default="0.99" />
     <arg name="add_random_particles_in_resampling" default="true" />
@@ -259,7 +262,7 @@
 
           <!-- If broadcast_tf is true,
           the localizer broadcasts transformation between the map and odometry frames. -->
-          <param name="broadcast_tf"      value="true" />
+          <param name="broadcast_tf"      value="false" />
 
           <!-- If use_odom_tf is false, transformation from the map to base link is directly broadcast.
           If your odometry node does not broadcast transformation between odometry and base link, this must be false. -->
@@ -344,7 +347,7 @@
 
 
 <!-- Map server -->
-    <arg name="map_file" default="/home/supannee/Project/src/ALS_Final_Project/als_mobile_robot/map/cafe/map_cafe.yaml"/>
+    <arg name="map_file" default="$(find als_mobile_robot)/map/cafe/map_cafe.yaml"/>
     <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
 
 
