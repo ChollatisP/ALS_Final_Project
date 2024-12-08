@@ -51,15 +51,15 @@
      <node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0.0 0.0 0.0 odom map 100"/>
      <!-- <node pkg="tf" type="static_transform_publisher" name="odom_to_base" args="0.0 0.0 0.0 0.0 0.0 0.0 /odom base_link 100"/> -->
      <!-- <node pkg="tf" type="static_transform_publisher" name="base_to_odom" args="0.1 0 0.2 0 0 0 /base_link /laser_frame 100"/>  -->
-          <node pkg="tf" type="static_transform_publisher" name="map_to_base" args="0 0 0 0 0 0 map /laser_frame 40"/> 
+          <!-- <node pkg="tf" type="static_transform_publisher" name="map_to_base" args="0 0 0 0 0 0 /base_link /scan 100"/>  -->
           <!-- <node name="static_transform_publisher" pkg="tf" type="static_transform_publisher" args="0.1 0 0 0 0 0 base_link lidar_link 40"/> -->
 
-     <param name="scan_topic" value="/scan" />
+     <!-- <param name="scan_topic" value="/scan" />
      <param name="base_frame" value="base_link" />
      <param name="map_frame" value="map" />
      <param name="max_iterations" value="10" />
      <param name="angular_threshold" value="0.1" />
-     <node pkg="laser_scan_matcher" type="laser_scan_matcher_node" name="laser_scan_matcher" />
+     <node pkg="laser_scan_matcher" type="laser_scan_matcher_node" name="laser_scan_matcher" /> -->
 
 <!-- mcl.launch -->
     <!-- ROS parameters -->
@@ -86,11 +86,11 @@
     <arg name="local_sdf_keypoints_name" default="/gl_local_sdf_keypoints" /> <!-- visualization_msgs::Marker -->
 
     <!-- TF frames -->
-     <arg name="laser_frame" default="laser_frame" />
+     <arg name="laser_frame" default="/laser_frame" />
      <arg name="base_link_frame" default="base_link" />
      <arg name="map_frame" default="map" />
      <arg name="odom_frame" default="odom" />
-     <arg name="use_odom_frame" default="true" />
+     <arg name="use_odom_frame" default="false" />
      
 
 <!-- MCL parameters -->
@@ -121,7 +121,7 @@
     <arg name="resample_threshold_ess" default="0.5" />
 
     <!-- If estimate_reliability is true, the reliability estimation is performed. -->
-    <arg name="estimate_reliability" default="false" />
+    <arg name="estimate_reliability" default="true" />
 
     <!-- A localization failure detector is used to perform the reliability estimation.
          0: mean absolute error.
@@ -137,12 +137,12 @@
 
     <!-- If use_gl_pose_sampler is true, global-localization-based pose sampler is used.
          The sampled poses are integrated to the mcl estimate via importance sampling. -->
-    <arg name="use_gl_pose_sampler" default="false" />
+    <arg name="use_gl_pose_sampler" default="true" />
 
     <!-- fuse_gl_pose_sampler_only_unreliable is true,
          the sampled pose is fused if reliability is less than 90 %.
          This flag is ignored if estimate_reliability is false. -->
-    <arg name="fuse_gl_pose_sampler_only_unreliable" default="false" />
+    <arg name="fuse_gl_pose_sampler_only_unreliable" default="true" />
 
 
     <arg name="gl_sampled_pose_time_th" default="1.0" />
@@ -171,7 +171,7 @@
     <arg name="pose_log_file" default="/tmp/als_ros_pose.txt" />
 
     <!-- localization Hz -->
-    <arg name="localization_hz" default="10.0" />
+    <arg name="localization_hz" default="12.0" />
 
     <!-- transform tolerance between mcl pose and odometry in second -->
     <arg name="transform_tolerance" default="0.0" />
@@ -262,7 +262,7 @@
 
           <!-- If broadcast_tf is true,
           the localizer broadcasts transformation between the map and odometry frames. -->
-          <param name="broadcast_tf"      value="false" />
+          <param name="broadcast_tf"      value="true" />
 
           <!-- If use_odom_tf is false, transformation from the map to base link is directly broadcast.
           If your odometry node does not broadcast transformation between odometry and base link, this must be false. -->

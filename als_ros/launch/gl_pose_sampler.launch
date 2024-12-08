@@ -18,7 +18,7 @@
     <arg name="map_frame" default="map" />
     <arg name="odom_frame" default="odom" />
     <arg name="base_link_frame" default="base_link" />
-    <arg name="laser_frame" default="laser" />
+    <arg name="laser_frame" default="laser_frame" />
 
     <!-- Global localization parameters -->
 
@@ -49,11 +49,11 @@
     <arg name="average_sdf_delta_th" default="0.01" />
 
     <!-- Add random and/or opposite direction samples when global localization candidate poses are found -->
-    <arg name="add_random_samples" default="true" />
-    <arg name="add_opposite_samples" default="true" />
+    <arg name="add_random_samples" default="false" />
+    <arg name="add_opposite_samples" default="false" />
 
     <!-- Number of random samples -->
-    <arg name="random_samples_num" default="20" />
+    <arg name="random_samples_num" default="5" />
 
     <!-- Positional and angular noises for the random sampling
          These values must be positive. -->
@@ -63,7 +63,7 @@
     <!-- Threshold to matching rate between scan measurements and a map
          Random samples are easily generated if this value close to 0.
          This value is ignored if less than 0. -->
-    <arg name="matching_rate_th" default="0.03" />
+    <arg name="matching_rate_th" default="0.5" />
 
 
 
