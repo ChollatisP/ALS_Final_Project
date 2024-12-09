@@ -1,25 +1,25 @@
 <launch >
 
 <!-- ROBOT -->
-    <master auto="start"/>
+<master auto="start"/>
 
-     <param name="robot_description" command="$(find xacro)/xacro '$(find als_mobile_robot)/urdf/robot.urdf.xacro'" />
+<param name="robot_description" command="$(find xacro)/xacro '$(find als_mobile_robot)/urdf/robot.urdf.xacro'" />
 
-     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
-     <param name="use_gui" value="False"/>
-     </node>
+<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+<param name="use_gui" value="False"/>
+</node>
 
-     <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher"></node>
+<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher"></node>
 
 <!-- GAZEBO -->
-     <arg name="paused" default="false"/>
-     <arg name="use_sim_time" default="true"/>
-     <arg name="gui" default="true"/>
-     <arg name="headless" default="false"/>
-     <arg name="debug" default="false"/>
-     <arg name="gui_required" default="true"/>
-     <arg name="mesh_enabled" default="true"/>
-     <arg name="robot_namespace" default="/"/>
+    <arg name="paused" default="false"/>
+        <arg name="use_sim_time" default="true"/>
+        <arg name="gui" default="true"/>
+        <arg name="headless" default="false"/>
+        <arg name="debug" default="false"/>
+        <arg name="gui_required" default="true"/>
+        <arg name="mesh_enabled" default="true"/>
+    <arg name="robot_namespace" default="/"/>
 
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
         <arg name="world_name" value="/home/supannee/Project/src/ALS_Final_Project/als_mobile_robot/world/cafe" />
@@ -33,7 +33,7 @@
 
     </include>
 
-     <group ns="$(arg robot_namespace)">
+    <group ns="$(arg robot_namespace)">
 
 
         <param name="robot_description" command="$(find xacro)/xacro '$(find als_mobile_robot)/urdf/robot.urdf.xacro'
@@ -53,10 +53,14 @@
                                 "/>
     </group>
 
-     <node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0.0 0.0 0.0 map odom 100"/>
-     <!-- <node pkg="tf" type="static_transform_publisher" name="odom_to_base" args="0.0 0.0 0.0 0.0 0.0 0.0 /odom base_link 100"/> -->
-     <node pkg="tf" type="static_transform_publisher" name="base_to_odom" args="0.1 0 0.2 0 0 0 /base_link /laser_frame 100"/> 
-     <!-- <node pkg="tf" type="static_transform_publisher" name="map_to_base" args="0 0 0 0 0 0 map /laser_frame 100""/>  -->
+     <!-- <node pkg="tf" type="static_transform_publisher" name="base_to_odom" args="0.1 0 0.2 0 0 0 /base_link /laser_frame 100"/>  -->
+
+     <param name="scan_topic"           value="/scan" />
+     <param name="base_frame"           value="base_link" />
+     <param name="map_frame"            value="map" />
+     <param name="max_iterations"       value="10" />
+     <param name="angular_threshold"    value="0.1" />
+     <node pkg="laser_scan_matcher" type="laser_scan_matcher_node" name="laser_scan_matcher" />
 
 <!-- mcl.launch -->
     <!-- ROS parameters -->
@@ -83,7 +87,7 @@
     <arg name="local_sdf_keypoints_name" default="/gl_local_sdf_keypoints" /> <!-- visualization_msgs::Marker -->
 
     <!-- TF frames -->
-     <arg name="laser_frame" default="laser" />
+     <arg name="laser_frame" default="lidar_link" />
      <arg name="base_link_frame" default="base_link" />
      <arg name="map_frame" default="map" />
      <arg name="odom_frame" default="odom" />
@@ -118,7 +122,7 @@
     <arg name="resample_threshold_ess" default="0.5" />
 
     <!-- If estimate_reliability is true, the reliability estimation is performed. -->
-    <arg name="estimate_reliability" default="false" />
+    <arg name="estimate_reliability" default="true" />
 
     <!-- A localization failure detector is used to perform the reliability estimation.
          0: mean absolute error.
@@ -168,7 +172,7 @@
     <arg name="pose_log_file" default="/tmp/als_ros_pose.txt" />
 
     <!-- localization Hz -->
-    <arg name="localization_hz" default="10.0" />
+    <arg name="localization_hz" default="50.0" />
 
     <!-- transform tolerance between mcl pose and odometry in second -->
     <arg name="transform_tolerance" default="0.0" />
@@ -204,13 +208,9 @@
 <!--  -->
 
 
-
-<!-- 
     <include file="$(find als_ros)/launch/map_server.launch" >
         <arg name="map_name" value="$(arg map_name)" />
-    </include > -->
-
-
+    </include >
 
 
     <include file="$(find als_ros)/launch/gl_pose_sampler.launch" if="$(arg use_gl_pose_sampler)" >
@@ -241,6 +241,8 @@
     <!-- MCL node -->
     <node name="$(arg node_name)" pkg="als_ros" type="mcl" output="screen" >
           <param name="measurement_model_type" value="2" />
+
+          <param name="use_map_topic" value="true"/>
 
         <param name="scan_name" value="$(arg scan_name)" type="string" />
         <param name="odom_name" value="$(arg odom_name)" type="string" />
@@ -344,8 +346,8 @@
 
 
 <!-- Map server -->
-    <arg name="map_file" default="/home/supannee/Project/src/ALS_Final_Project/als_mobile_robot/map/cafe/map_cafe.yaml"/>
-    <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+    <!-- <arg name="map_file" default="$(find als_mobile_robot)/map/cafe/map_cafe.yaml"/>
+    <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" /> -->
 
 
 
@@ -362,6 +364,7 @@
      <rosparam file="$(find als_mobile_robot)/config/local_costmap_params.yaml" command="load" />
      <rosparam file="$(find als_mobile_robot)/config/global_costmap_params.yaml" command="load" />
      <rosparam file="$(find als_mobile_robot)/config/dwa_local_planner_params.yaml" command="load" />
+     <rosparam file="$(find als_mobile_robot)/config/move_base_params.yaml" command="load" />
      <remap from="cmd_vel" to="$(arg cmd_vel_topic)"/>
      <remap from="odom" to="$(arg odom_topic)"/>
      <param name="DWAPlannerROS/min_vel_x" value="0.0" if="$(arg move_forward_only)" />

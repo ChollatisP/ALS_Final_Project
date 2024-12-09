@@ -30,7 +30,7 @@ local_costmap:
       max_range: 5.0
       observation_persistence: 0.0
       raytrace_range: 3.0
-      sensor_frame: laser_link
+      sensor_frame: lidar_link
 
   # Inflation Layer parameters
   inflation_layer:

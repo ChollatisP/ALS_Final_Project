@@ -7,7 +7,7 @@
     <arg name="node_name" default="slamer" />
 
     <!-- Input messages -->
-    <arg name="scan_name" default="/scan" /> <!-- sensor_msgs::LaserScan -->
+    <arg name="scan_name" default="/scan" /> <!-- sensor_msgs::LaserScan (/scan)--> 
     <arg name="odom_name" default="/odom" /> <!-- nav_msgs::Odometry -->
     <arg name="map_name" default="/map" /> <!-- nav_msgs::OccupancyGrid -->
 
