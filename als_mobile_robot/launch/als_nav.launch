@@ -53,45 +53,46 @@
                                 "/>
     </group>
 
-     <!-- <node pkg="tf" type="static_transform_publisher" name="base_to_odom" args="0.1 0 0.2 0 0 0 /base_link /laser_frame 100"/>  -->
+     <node pkg="tf" type="static_transform_publisher" name="base_to_odom" args="0.1 0 0.2 0 0 0 map odom 50"/> 
+     <!-- <node pkg="tf" type="static_transform_publisher" name="base_to_odom" args="0.1 0 0.2 0 0 0 map /laser_frame 100"/>  -->
 
-     <param name="scan_topic"           value="/scan" />
-     <param name="base_frame"           value="base_link" />
-     <param name="map_frame"            value="map" />
+     <!-- <param name="scan_topic"           value="/scan" />
+     <param name="base_frame"           value="/base_link" />
+     <param name="map_frame"            value="/map" />
      <param name="max_iterations"       value="10" />
      <param name="angular_threshold"    value="0.1" />
-     <node pkg="laser_scan_matcher" type="laser_scan_matcher_node" name="laser_scan_matcher" />
+     <node pkg="laser_scan_matcher" type="laser_scan_matcher_node" name="laser_scan_matcher" /> -->
 
 <!-- mcl.launch -->
     <!-- ROS parameters -->
-     <param name="use_sim_time" value="true"/>
+     <param name="use_sim_time"         value="true"/>
     <!-- Node name -->
-    <arg name="node_name" default="mcl" />
+    <arg name="node_name"               default="mcl" />
 
     <!-- Input messages -->
-    <arg name="scan_name" default="/scan" /> <!-- sensor_msgs::LaserScan -->
-    <arg name="odom_name" default="/odom" /> <!-- nav_msgs::Odometry -->
-    <arg name="map_name" default="/map" /> <!-- nav_msgs::OccupancyGrid -->
+    <arg name="scan_name"               default="/scan" /> <!-- sensor_msgs::LaserScan -->
+    <arg name="odom_name"               default="/odom" /> <!-- nav_msgs::Odometry -->
+    <arg name="map_name"                default="/map" /> <!-- nav_msgs::OccupancyGrid -->
 
     <!-- Output messages -->
-    <arg name="pose_name" default="/mcl_pose" /> <!-- geometry_msgs::PoseStamped -->
-    <arg name="particles_name" default="/mcl_particles" /> <!-- geometry_msgs::PoseArray -->
-    <arg name="unknown_scan_name" default="/unknown_scan" /> <!-- sensor_msgs::LaserScan -->
-    <arg name="residual_errors_name" default="/residual_errors" /> <!-- sensor_msgs::LaserScan -->
+    <arg name="pose_name"               default="/mcl_pose" /> <!-- geometry_msgs::PoseStamped -->
+    <arg name="particles_name"          default="/mcl_particles" /> <!-- geometry_msgs::PoseArray -->
+    <arg name="unknown_scan_name"       default="/unknown_scan" /> <!-- sensor_msgs::LaserScan -->
+    <arg name="residual_errors_name"    default="/residual_errors" /> <!-- sensor_msgs::LaserScan -->
     <arg name="reliability_marker_name" default="/reliability_marker_name" /> <!-- visualization_msgs::Marker -->
 
     <!-- Output messages from GL pose sampler -->
-    <arg name="gl_sampled_poses_name" default="/gl_sampled_poses" /> <!-- geometry_msgs::PoseArray -->
-    <arg name="local_map_name" default="/gl_local_map" /> <!-- nav_msgs::OccupancyGrid -->
-    <arg name="sdf_keypoints_name" default="/gl_sdf_keypoints" /> <!-- visualization_msgs::Marker -->
-    <arg name="local_sdf_keypoints_name" default="/gl_local_sdf_keypoints" /> <!-- visualization_msgs::Marker -->
+    <arg name="gl_sampled_poses_name"        default="/gl_sampled_poses" /> <!-- geometry_msgs::PoseArray -->
+    <arg name="local_map_name"               default="/gl_local_map" /> <!-- nav_msgs::OccupancyGrid -->
+    <arg name="sdf_keypoints_name"           default="/gl_sdf_keypoints" /> <!-- visualization_msgs::Marker -->
+    <arg name="local_sdf_keypoints_name"     default="/gl_local_sdf_keypoints" /> <!-- visualization_msgs::Marker -->
 
     <!-- TF frames -->
-     <arg name="laser_frame" default="lidar_link" />
-     <arg name="base_link_frame" default="base_link" />
-     <arg name="map_frame" default="map" />
-     <arg name="odom_frame" default="odom" />
-     <arg name="use_odom_frame" default="true" />
+     <arg name="laser_frame"            default="lidar_link" />
+     <arg name="base_link_frame"        default="base_link" />
+     <arg name="map_frame"              default="map" />
+     <arg name="odom_frame"             default="odom" />
+     <arg name="use_odom_frame"         default="true" />
      
 
 <!-- MCL parameters -->
@@ -99,7 +100,7 @@
          In this MCL package, the numbers of the particles are constant. -->
     <arg name="particle_num" default="1000" />
 
-    <arg name="use_augmented_mcl" default="false" />
+    <arg name="use_augmented_mcl" default="true" />
     <arg name="alpha_slow" default="0.001" />
     <arg name="alpha_fast" default="0.99" />
     <arg name="add_random_particles_in_resampling" default="true" />
@@ -242,7 +243,7 @@
     <node name="$(arg node_name)" pkg="als_ros" type="mcl" output="screen" >
           <param name="measurement_model_type" value="2" />
 
-          <param name="use_map_topic" value="true"/>
+          <!-- <param name="use_map_topic" value="true"/> -->
 
         <param name="scan_name" value="$(arg scan_name)" type="string" />
         <param name="odom_name" value="$(arg odom_name)" type="string" />
@@ -265,7 +266,7 @@
 
           <!-- If use_odom_tf is false, transformation from the map to base link is directly broadcast.
           If your odometry node does not broadcast transformation between odometry and base link, this must be false. -->
-          <param name="use_odom_tf"       value="true" />
+          <param name="use_odom_tf"       value="false" />
 
           <!-- Initial pose (x [m], y [m], yaw [deg]) -->
           <param name="initial_pose_x"    value="0.0" />
@@ -308,17 +309,30 @@
           The sum of z_hit, z_max, and z_rand must be 1
           when the likelihood field and class coditional measurment models are used. 
           The sum of z_hit, z_short, z_max, and z_rand must be 1 when the beam model is used. -->
-          <param name="laser_max_range"           value="-1"/>      
-          <param name="laser_max_beams"           value="30"/> 
+          <!-- <param name="laser_max_range"           value="-1"/>      
+          <param name="laser_max_beams"           value="30"/>  -->
+
+<!-- 
+
           <param name="/z_hit"                    value="0.95" /> 
           <param name="/z_short"                  value="0.1" /> 
           <param name="/z_max"                    value="0.05" /> 
           <param name="/z_rand"                   value="0.05" /> 
           <param name="/var_hit"                  value="0.01" /> 
           <param name="/lambda_short"             value="0.1" /> 
-          <param name="/lambda_unknown"           value="0.01"  /> 
-          <param name="laser_likelihood_max_dist" value="2.0"/>
-          <param name="laser_model_type"          value="likelihood_field"/>
+          <param name="/lambda_unknown"           value="0.01"  />  -->
+
+          <param name="z_hit" value="0.95" type="double" />
+          <param name="z_short" value="0.1" type="double" />
+          <param name="z_max" value="0.05" type="double" />
+          <param name="z_rand" value="0.05" type="double" />
+          <param name="var_hit" value="0.01" type="double" />
+          <param name="lambda_short" value="0.1" type="double" />
+          <param name="lambda_unknown" value="0.01" type="double" />
+
+
+          <!-- <param name="laser_likelihood_max_dist" value="2.0"/>
+          <param name="laser_model_type"          value="likelihood_field"/> -->
 
         <param name="known_class_prior" value="$(arg known_class_prior)" type="double" />
 
@@ -336,8 +350,8 @@
         <param name="gmm_positional_variance" value="$(arg gmm_positional_variance)" type="double" />
         <param name="gmm_angular_variance" value="$(arg gmm_angular_variance)" type="double" />
 
-        <param name="write_pose" value="$(arg write_pose)" type="bool" />
-        <param name="pose_log_file" value="$(arg pose_log_file)" type="string" />
+        <!-- <param name="write_pose" value="$(arg write_pose)" type="bool" />
+        <param name="pose_log_file" value="$(arg pose_log_file)" type="string" /> -->
 
         <param name="localization_hz" value="$(arg localization_hz)" type="double" />
         <param name="transform_tolerance" value="$(arg transform_tolerance)" type="double" />
@@ -350,28 +364,26 @@
     <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" /> -->
 
 
-
 <!-- move_base -->
     <arg name="cmd_vel_topic" default="/velocity_controller/cmd_vel" />
     <arg name="odom_topic" default="odom" />
     <arg name="move_forward_only" default="false"/>
 
      <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
-     <rosparam file="$(find als_mobile_robot)/config/move_base_params.yaml" command="load" />
-     <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
-     <rosparam file="$(find als_mobile_robot)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
-     <rosparam file="$(find als_mobile_robot)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
-     <rosparam file="$(find als_mobile_robot)/config/local_costmap_params.yaml" command="load" />
-     <rosparam file="$(find als_mobile_robot)/config/global_costmap_params.yaml" command="load" />
-     <rosparam file="$(find als_mobile_robot)/config/dwa_local_planner_params.yaml" command="load" />
-     <rosparam file="$(find als_mobile_robot)/config/move_base_params.yaml" command="load" />
-     <remap from="cmd_vel" to="$(arg cmd_vel_topic)"/>
-     <remap from="odom" to="$(arg odom_topic)"/>
-     <param name="DWAPlannerROS/min_vel_x" value="0.0" if="$(arg move_forward_only)" />
-</node>
+          <rosparam file="$(find als_mobile_robot)/config/move_base_params.yaml" command="load" />
+          <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
+          <rosparam file="$(find als_mobile_robot)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
+          <rosparam file="$(find als_mobile_robot)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+          <rosparam file="$(find als_mobile_robot)/config/local_costmap_params.yaml" command="load" />
+          <rosparam file="$(find als_mobile_robot)/config/global_costmap_params.yaml" command="load" />
+          <rosparam file="$(find als_mobile_robot)/config/dwa_local_planner_params.yaml" command="load" />
+          <rosparam file="$(find als_mobile_robot)/config/move_base_params.yaml" command="load" />
+          <remap from="cmd_vel" to="$(arg cmd_vel_topic)"/>
+          <remap from="odom" to="$(arg odom_topic)"/>
+          <param name="DWAPlannerROS/min_vel_x" value="0.0" if="$(arg move_forward_only)" />
+     </node>
 
 <!-- rviz -->
-    <node pkg="rviz" type="rviz" name="rviz" required="true"
-    args="-d $(find als_mobile_robot)/rviz/mcl.rviz"/>
+    <node pkg="rviz" type="rviz" name="rviz" required="true" args="-d $(find als_mobile_robot)/rviz/navigation.rviz"/>
 
 </launch >
