@@ -3,6 +3,17 @@
 <!-- ROBOT -->
 <master auto="start"/>
 
+<node pkg="rf2o_laser_odometry" type="rf2o_laser_odometry_node" name="rf2o_laser_odometry" output="screen">
+    <param name="laser_scan_topic" value="/laser_scan"/>        # topic where the lidar scans are being published
+    <param name="odom_topic" value="/odom_rf2o" />              # topic where tu publish the odometry estimations
+    <param name="publish_tf" value="true" />                   # wheter or not to publish the tf::transform (base->odom)
+    <param name="base_frame_id" value="/base_link"/>            # frame_id (tf) of the mobile robot base. A tf transform from the laser_frame to the base_frame is mandatory
+    <param name="odom_frame_id" value="/odom" />                # frame_id (tf) to publish the odometry estimations    
+    <param name="init_pose_from_topic" value="/base_pose_ground_truth" /> # (Odom topic) Leave empty to start at point (0,0)
+    <param name="freq" value="6.0"/>                            # Execution frequency.
+    <param name="verbose" value="true" />                       # verbose
+  </node>
+
 <param name="robot_description" command="$(find xacro)/xacro '$(find als_mobile_robot)/urdf/robot.urdf.xacro'" />
 
 <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
@@ -14,15 +25,15 @@
 <!-- GAZEBO -->
     <arg name="paused" default="false"/>
         <arg name="use_sim_time" default="true"/>
-        <arg name="gui" default="true"/>
-        <arg name="headless" default="false"/>
+        <arg name="gui" default="false"/>
+        <arg name="headless" default="true"/>
         <arg name="debug" default="false"/>
-        <arg name="gui_required" default="true"/>
+        <arg name="gui_required" default="false"/>
         <arg name="mesh_enabled" default="true"/>
     <arg name="robot_namespace" default="/"/>
 
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
-        <arg name="world_name" value="/home/supannee/Project/src/ALS_Final_Project/als_mobile_robot/world/cafe" />
+        <arg name="world_name" value="/home/chollatis/ros_ws/ALS_Project/src/ALS_Final_Project/als_mobile_robot/world/cafe" />
         <arg name="paused" value="$(arg paused)"/>
         <arg name="use_sim_time" value="$(arg use_sim_time)"/>
         <arg name="gui" value="$(arg gui)"/>
@@ -53,8 +64,8 @@
                                 "/>
     </group>
 
-     <node pkg="tf" type="static_transform_publisher" name="base_to_odom" args="0.1 0 0.2 0 0 0 map odom 50"/> 
-     <!-- <node pkg="tf" type="static_transform_publisher" name="base_to_odom" args="0.1 0 0.2 0 0 0 map /laser_frame 100"/>  -->
+     <node pkg="tf" type="static_transform_publisher" name="base_to_odom" args="0.1 0 0.2 0 0 0 map odom 100"/> 
+     <!-- <node pkg="tf" type="static_transform_publisher" name="base_to_lidar" args="0.1 0 0.2 0 0 0 base_link lidar_link 100"/>  -->
 
      <!-- <param name="scan_topic"           value="/scan" />
      <param name="base_frame"           value="/base_link" />
@@ -91,7 +102,7 @@
      <arg name="laser_frame"            default="lidar_link" />
      <arg name="base_link_frame"        default="base_link" />
      <arg name="map_frame"              default="map" />
-     <arg name="odom_frame"             default="odom" />
+     <arg name="odom_frame"             default="odom_rf2o" />
      <arg name="use_odom_frame"         default="true" />
      
 
@@ -176,7 +187,7 @@
     <arg name="localization_hz" default="50.0" />
 
     <!-- transform tolerance between mcl pose and odometry in second -->
-    <arg name="transform_tolerance" default="0.0" />
+    <arg name="transform_tolerance" default="0.2" />
 
     <!-- Parameters used for randam particles in resampling (x, y, yaw).
          These parameters are used when use_augmented_mcl or add_random_particles_in_resampling is true. -->
@@ -366,7 +377,7 @@
 
 <!-- move_base -->
     <arg name="cmd_vel_topic" default="/velocity_controller/cmd_vel" />
-    <arg name="odom_topic" default="odom" />
+    <arg name="odom_topic" default="odom_rf2o" />
     <arg name="move_forward_only" default="false"/>
 
      <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
