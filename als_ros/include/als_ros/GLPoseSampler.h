@@ -148,7 +148,7 @@ public:
         mapFrame_("map"),
         odomFrame_("odom"),
         baseLinkFrame_("base_link"),
-        laserFrame_("laser"),
+        laserFrame_("lidar_link"),
         keyScansNum_(5),
         keyScanIntervalDist_(0.5),
         keyScanIntervalYaw_(5.0),
