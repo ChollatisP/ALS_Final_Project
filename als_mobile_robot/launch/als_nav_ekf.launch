@@ -52,10 +52,16 @@
                         velocity_controller
                                 "/>
     </group>
-<!-- 
-     <node pkg="tf" type="static_transform_publisher" name="base_to_odom" args="0.1 0 0.2 0 0 0 map odom 50"/>  -->
 
-     <!-- <node name="odom_listener" pkg="als_mobile_robot" type="odom.py" output="screen" /> -->
+     <node pkg="tf" type="static_transform_publisher" name="base_to_odom" args="0.1 0 0.2 0 0 0 map odom_combined 50"/> 
+     <!-- <node pkg="tf" type="static_transform_publisher" name="base_to_odom" args="0.1 0 0.2 0 0 0 map /laser_frame 100"/>  -->
+
+     <!-- <param name="scan_topic"           value="/scan" />
+     <param name="base_frame"           value="/base_link" />
+     <param name="map_frame"            value="/map" />
+     <param name="max_iterations"       value="10" />
+     <param name="angular_threshold"    value="0.1" />
+     <node pkg="laser_scan_matcher" type="laser_scan_matcher_node" name="laser_scan_matcher" /> -->
 
 <!-- mcl.launch -->
     <!-- ROS parameters -->
@@ -86,7 +92,7 @@
      <arg name="base_link_frame"        default="base_link" />
      <arg name="laser_frame"            default="lidar_link" />
      <arg name="map_frame"              default="map" />
-     <arg name="odom_frame"             default="odom" />
+     <arg name="odom_frame"             default="odom_combined" />
      <arg name="use_odom_frame"         default="true" />
      
 
@@ -381,6 +387,18 @@
 <!-- rviz -->
     <node pkg="rviz" type="rviz" name="rviz" required="true" args="-d $(find als_mobile_robot)/rviz/navigation.rviz"/>
 
+<!-- ekf -->
+<node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf">
+  <param name="output_frame" value="odom_combined"/>
+  <param name="base_footprint_frame" value="base_footprint"/>
+  <param name="freq" value="30.0"/>
+  <param name="sensor_timeout" value="1.0"/>  
+  <param name="odom_used" value="true"/>
+  <param name="imu_used" value="true"/>
+  <param name="vo_used" value="true"/>
+
+  <remap from="odom" to="pr2_base_odometry/odom" />
+</node>
 
 
 </launch >

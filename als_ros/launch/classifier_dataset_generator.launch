@@ -2,7 +2,7 @@
 <launch >
     <!-- Set your map yaml file
          Map server will publish this map with the given name. -->
-    <arg name="map_yaml_file" default="/home/akai/Dropbox/git/AutoNavi/ros/maps/nic_garage/ogm.yaml" />
+    <arg name="map_yaml_file" default="/home/supannee/Project/src/ALS_Final_Project/als_mobile_robot/map/cafe/map_cafe.yaml" />
     <arg name="map_name" default="/map" />
 
     <!-- Number of generated samples -->

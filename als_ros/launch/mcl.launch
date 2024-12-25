@@ -1,4 +1,4 @@
-<!-- mcl.launch -->
+<!-- mcl.launch
 <launch >
     <!-- ROS parameters -->
 
@@ -320,4 +320,4 @@
         <param name="localization_hz" value="$(arg localization_hz)" type="double" />
         <param name="transform_tolerance" value="$(arg transform_tolerance)" type="double" />
     </node >
-</launch >
+</launch > -->
