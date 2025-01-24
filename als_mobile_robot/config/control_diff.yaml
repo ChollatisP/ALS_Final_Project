@@ -7,6 +7,8 @@ velocity_controller:
   left_wheel: 'left_wheel'
   right_wheel: 'right_wheel'
   publish_rate: 20  # Reduced to 20 Hz (was 30)
+  odom_frame_id: "odom"
+  base_frame_id: "base_link"
   pose_covariance_diagonal: [0.001, 0.001, 1000000.0, 1000000.0, 1000000.0, 1000.0]
   twist_covariance_diagonal: [0.001, 0.001, 1000000.0, 1000000.0, 1000000.0, 1000.0]
   wheel_separation: 0.35

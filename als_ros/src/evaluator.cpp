@@ -44,7 +44,7 @@ public:
     Evaluator(void):
         nh_("~"),
         mapFrame_("map"),
-        laserFrame_("laser"),
+        laserFrame_("lidar_link"),
         canUpdateGTPoses_(true),
         canUpdateGLPoses_(true),
         canUpdateScan_(true),

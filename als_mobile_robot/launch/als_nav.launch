@@ -22,7 +22,7 @@
     <arg name="robot_namespace" default="/"/>
 
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
-        <arg name="world_name" value="/home/supannee/Project/src/ALS_Final_Project/als_mobile_robot/world/cafe" />
+        <arg name="world_name" value="/home/supannee/Project/src/ALS_Final_Project/als_mobile_robot/world/hexagon.world" />
         <arg name="paused" value="$(arg paused)"/>
         <arg name="use_sim_time" value="$(arg use_sim_time)"/>
         <arg name="gui" value="$(arg gui)"/>
@@ -52,10 +52,16 @@
                         velocity_controller
                                 "/>
     </group>
-<!-- 
-     <node pkg="tf" type="static_transform_publisher" name="base_to_odom" args="0.1 0 0.2 0 0 0 map odom 50"/>  -->
 
-     <!-- <node name="odom_listener" pkg="als_mobile_robot" type="odom.py" output="screen" /> -->
+     <node pkg="tf" type="static_transform_publisher" name="base_to_odom" args="0.0 0 0.0 0 0 0 map odom 50"/> 
+     <!-- <node pkg="tf" type="static_transform_publisher" name="base_to_odom" args="0.1 0 0.2 0 0 0 map /laser_frame 100"/>  -->
+
+     <!-- <param name="scan_topic"           value="/scan" />
+     <param name="base_frame"           value="/base_link" />
+     <param name="map_frame"            value="/map" />
+     <param name="max_iterations"       value="10" />
+     <param name="angular_threshold"    value="0.1" />
+     <node pkg="laser_scan_matcher" type="laser_scan_matcher_node" name="laser_scan_matcher" /> -->
 
 <!-- mcl.launch -->
     <!-- ROS parameters -->
@@ -379,7 +385,8 @@
      </node>
 
 <!-- rviz -->
-    <node pkg="rviz" type="rviz" name="rviz" required="true" args="-d $(find als_mobile_robot)/rviz/navigation.rviz"/>
+     <node pkg="rviz" type="rviz" name="rviz" required="true" args="-d $(find als_mobile_robot)/rviz/navigation.rviz"/>
+
 
 
 

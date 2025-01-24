@@ -12,7 +12,6 @@ Panels:
         - /Local Map1/Polygon1
         - /Local Map1/Costmap1
         - /Local Map1/Planner1
-        - /Camera1
       Splitter Ratio: 0.5
     Tree Height: 458
   - Class: rviz/Selection
