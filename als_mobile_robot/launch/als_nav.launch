@@ -53,8 +53,8 @@
                                 "/>
     </group>
 
-     <node pkg="tf" type="static_transform_publisher" name="base_to_odom" args="0.0 0 0.0 0 0 0 map odom 50"/> 
-     <!-- <node pkg="tf" type="static_transform_publisher" name="base_to_odom" args="0.1 0 0.2 0 0 0 map /laser_frame 100"/>  -->
+     <node pkg="tf" type="static_transform_publisher" name="base_to_odom" args="0 0 0 0 0 0 map odom 50"/> 
+     <!-- <node pkg="tf" type="static_transform_publisher" name="base_to_odom" args="0.1 0 0.2 0 0 0 /scan map 100"/>  -->
 
      <!-- <param name="scan_topic"           value="/scan" />
      <param name="base_frame"           value="/base_link" />
@@ -99,7 +99,7 @@
 <!-- MCL parameters -->
     <!-- Numbers of particles
          In this MCL package, the numbers of the particles are constant. -->
-    <arg name="particle_num" default="1000" />
+    <arg name="particle_num" default="5000" />
 
     <arg name="use_augmented_mcl" default="true" />
     <arg name="alpha_slow" default="0.001" />
@@ -140,12 +140,12 @@
 
     <!-- If use_gl_pose_sampler is true, global-localization-based pose sampler is used.
          The sampled poses are integrated to the mcl estimate via importance sampling. -->
-    <arg name="use_gl_pose_sampler" default="false" />
+    <arg name="use_gl_pose_sampler" default="true" />
 
     <!-- fuse_gl_pose_sampler_only_unreliable is true,
          the sampled pose is fused if reliability is less than 90 %.
          This flag is ignored if estimate_reliability is false. -->
-    <arg name="fuse_gl_pose_sampler_only_unreliable" default="false" />
+    <arg name="fuse_gl_pose_sampler_only_unreliable" default="true" />
 
 
     <arg name="gl_sampled_pose_time_th" default="1.0" />
@@ -166,7 +166,7 @@
 
     <!-- If use_mrf_failure_detector is true, Markov-random-fields-based localization failure detector is used.
          Note that Note that the failure detector just publishes failure probability. -->
-    <arg name="use_mrf_failure_detector" default="false" />
+    <arg name="use_mrf_failure_detector" default="true" />
 
     <!-- Write pose if write_pose is true
          Pose data (timestamp, x, y, yaw) will be recorded in the pose_log_file. -->
@@ -288,7 +288,7 @@
           If add_random_particles_in_resampling is true, random particles are also added in resampling.
           (random_particles_rate * particle_num) particles are added
           if add_random_particles_in_resampling is true. -->
-          <param name="use_augmented_mcl"                   value="false" />
+          <param name="use_augmented_mcl"                   value="true" />
           <param name="alpha_slow"                          value="0.001" />
           <param name="alpha_fast"                          value="0.99" />
           <param name="add_random_particles_in_resampling"  value="true" />

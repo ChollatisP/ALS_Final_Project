@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-
 import rospy
 import math
+import csv
+import os
 from geometry_msgs.msg import PoseStamped
 from gazebo_msgs.msg import ModelStates
 from tf.transformations import euler_from_quaternion
@@ -12,6 +13,14 @@ base_link_pose = None
 
 # Robot name in Gazebo
 ROBOT_NAME = "/"  # Replace with your actual robot's name if different
+
+# CSV file path
+CSV_FILE = "cafe(Distance between ALS and Base Link).csv"
+
+if not os.path.exists(CSV_FILE):
+    with open(CSV_FILE, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["Timestamp", "ALS(X)", "ALS(Y)", "Base Link(X)", "Base Link(Y)", "Distance between ALS and Base Link"])
 
 # Callback function to get MCL pose
 def mcl_pose_callback(msg):
@@ -40,6 +49,9 @@ def compare_poses():
         # Calculate distance
         distance = calculate_distance(mcl_pose, base_link_pose)
 
+        # Get timestamp
+        timestamp = rospy.get_time()
+
         # Calculate yaw for both poses
         yaw_mcl = euler_from_quaternion([
             mcl_pose.orientation.x,
@@ -55,9 +67,19 @@ def compare_poses():
         ])[2]
 
         # Log the results
-        rospy.loginfo("MCL Pose: [x: %f, y: %f]", mcl_pose.position.x, mcl_pose.position.y)
+        rospy.loginfo("ALS Pose: [x: %f, y: %f]", mcl_pose.position.x, mcl_pose.position.y)
         rospy.loginfo("Base Link Pose: [x: %f, y: %f]", base_link_pose.position.x, base_link_pose.position.y)
-        rospy.loginfo("Distance between MCL and Base Link: %f", distance)
+        rospy.loginfo("Distance between ALS and Base Link: %f", distance)
+
+          # Write data to CSV
+        with open(CSV_FILE, mode='a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([
+                timestamp,
+                mcl_pose.position.x, mcl_pose.position.y,
+                base_link_pose.position.x, base_link_pose.position.y,
+                distance
+            ])
     else:
         rospy.loginfo("Waiting for both poses to be initialized...")
 
