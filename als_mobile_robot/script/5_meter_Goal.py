@@ -25,7 +25,7 @@ class MoveBaseWithLogging:
         self.logging = True
 
         self.csv_directory = os.path.expanduser("~/Project/src/ALS_Final_Project/als_mobile_robot/result/")
-        self.csv_filename = os.path.join(self.csv_directory, "localization_data_mcl.csv")
+        self.csv_filename = os.path.join(self.csv_directory, "localization_data_mcl_2.csv")
 
         if not os.path.exists(self.csv_directory):
             os.makedirs(self.csv_directory)
