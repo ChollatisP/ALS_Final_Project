@@ -4,10 +4,14 @@ import rospy
 import actionlib
 import csv
 import os
+import threading
+import psutil
+import time
+from datetime import datetime
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import PoseStamped
-import threading
+from tf.transformations import quaternion_from_euler
 
 class MoveBaseWithLogging:
     def __init__(self):
@@ -23,9 +27,11 @@ class MoveBaseWithLogging:
 
         self.data_log = []
         self.logging = True
+        self.lock = threading.Lock()
 
-        self.csv_directory = os.path.expanduser("~/Project/src/ALS_Final_Project/als_mobile_robot/result/")
-        self.csv_filename = os.path.join(self.csv_directory, "localization_data_mcl_2.csv")
+        self.csv_directory = "/home/supannee/Project/src/ALS_Final_Project/als_mobile_robot/result/Narrow_Map/5_meter_obct/"
+        self.csv_filename = os.path.join(self.csv_directory, "localization_data_mcl.csv")
+        self.system_log_filename = os.path.join(self.csv_directory, "system_usage.csv")
 
         if not os.path.exists(self.csv_directory):
             os.makedirs(self.csv_directory)
@@ -35,6 +41,11 @@ class MoveBaseWithLogging:
                 writer = csv.writer(file)
                 writer.writerow(["MCL_time", "MCL_X", "MCL_Y", "Odom_time", "Odom_X", "Odom_Y", "Distance"])
 
+        if not os.path.exists(self.system_log_filename):
+            with open(self.system_log_filename, mode='w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(['Timestamp', 'CPU Usage (%)', 'RAM Usage (%)'])
+
         self.latest_mcl = None
         self.latest_odom = None
         self.mcl_time = None
@@ -43,15 +54,18 @@ class MoveBaseWithLogging:
         self.logging_thread = threading.Thread(target=self.log_position)
         self.logging_thread.start()
 
+        self.system_monitor_thread = threading.Thread(target=self.log_system_usage)
+        self.system_monitor_thread.start()
+
+        rospy.on_shutdown(self.cleanup)
+
     def mcl_callback(self, msg):
         self.latest_mcl = msg.pose
         self.mcl_time = msg.header.stamp.to_sec()
-        rospy.loginfo(f"MCL Pose Updated: X={msg.pose.position.x}, Y={msg.pose.position.y}")
 
     def odom_callback(self, msg):
         self.latest_odom = msg.pose.pose
         self.odom_time = msg.header.stamp.to_sec()
-        rospy.loginfo(f"Odom Pose Updated: X={msg.pose.pose.position.x}, Y={msg.pose.pose.position.y}")
 
     def calculate_distance(self, pose1, pose2):
         dx = pose1.position.x - pose2.position.x
@@ -61,23 +75,28 @@ class MoveBaseWithLogging:
     def log_position(self):
         rate = rospy.Rate(10)
         while self.logging and not rospy.is_shutdown():
-            rospy.sleep(0.1)
-
             if self.latest_mcl and self.latest_odom:
-                mcl_x = self.latest_mcl.position.x
-                mcl_y = self.latest_mcl.position.y
-                odom_x = self.latest_odom.position.x
-                odom_y = self.latest_odom.position.y
-                distance = self.calculate_distance(self.latest_mcl, self.latest_odom)
+                with self.lock:
+                    mcl_x = self.latest_mcl.position.x
+                    mcl_y = self.latest_mcl.position.y
+                    odom_x = self.latest_odom.position.x
+                    odom_y = self.latest_odom.position.y
+                    distance = self.calculate_distance(self.latest_mcl, self.latest_odom)
 
-                self.data_log.append([self.mcl_time, mcl_x, mcl_y, self.odom_time, odom_x, odom_y, distance])
-                rospy.loginfo(f"Logging Data: MCL=({mcl_x}, {mcl_y}) at {self.mcl_time} | ODOM=({odom_x}, {odom_y}) at {self.odom_time} | Distance={distance}")
-
-                with open(self.csv_filename, mode='a', newline='') as file:
-                    writer = csv.writer(file)
-                    writer.writerow([self.mcl_time, mcl_x, mcl_y, self.odom_time, odom_x, odom_y, distance])
-
+                    with open(self.csv_filename, mode='a', newline='') as file:
+                        writer = csv.writer(file)
+                        writer.writerow([self.mcl_time, mcl_x, mcl_y, self.odom_time, odom_x, odom_y, distance])
             rate.sleep()
+
+    def log_system_usage(self):
+        while self.logging and not rospy.is_shutdown():
+            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+            cpu_usage = psutil.cpu_percent(interval=0.1)
+            ram_usage = psutil.virtual_memory().percent
+            with open(self.system_log_filename, mode='a', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow([timestamp, cpu_usage, ram_usage])
+            time.sleep(0.1)
 
     def move_to_goal(self, x, y, theta):
         goal = MoveBaseGoal()
@@ -86,7 +105,11 @@ class MoveBaseWithLogging:
 
         goal.target_pose.pose.position.x = x
         goal.target_pose.pose.position.y = y
-        goal.target_pose.pose.orientation.w = 1.0
+        q = quaternion_from_euler(0, 0, theta)
+        goal.target_pose.pose.orientation.x = q[0]
+        goal.target_pose.pose.orientation.y = q[1]
+        goal.target_pose.pose.orientation.z = q[2]
+        goal.target_pose.pose.orientation.w = q[3]
 
         rospy.loginfo(f"Sending goal: x={x}, y={y}, theta={theta}")
         self.client.send_goal(goal)
@@ -98,6 +121,13 @@ class MoveBaseWithLogging:
             rospy.logwarn("Failed to reach goal.")
 
         self.logging = False
+
+    def cleanup(self):
+        rospy.loginfo("Shutting down logging threads...")
+        self.logging = False
+        self.logging_thread.join()
+        self.system_monitor_thread.join()
+        rospy.loginfo("Shutdown complete.")
 
 if __name__ == '__main__':
     try:
