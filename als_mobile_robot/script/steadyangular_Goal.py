@@ -27,7 +27,7 @@ class MoveBaseWithLogging:
         self.logging = True  # ควบคุมการบันทึก
         
         # กำหนดพาธไฟล์ CSV
-        self.csv_directory = os.path.expanduser("/home/supannee/Project/src/ALS_Final_Project/als_mobile_robot/result/Narrow_Map/Rotation/")
+        self.csv_directory = os.path.expanduser("/home/supannee/Project/src/ALS_Final_Project/als_mobile_robot/result/Normal_Ob/Rotation/iter5/")
         self.localization_filename = os.path.join(self.csv_directory, "localization_rotation_data.csv")
         self.system_usage_filename = os.path.join(self.csv_directory, "system_usage_rotation_data.csv")
         

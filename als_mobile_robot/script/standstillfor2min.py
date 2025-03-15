@@ -22,7 +22,7 @@ class StationaryLogging:
         self.logging = True  # ควบคุมการบันทึก
 
         # กำหนดพาธสำหรับบันทึกไฟล์ CSV
-        self.csv_directory = os.path.expanduser("/home/supannee/Project/src/ALS_Final_Project/als_mobile_robot/result/Narrow_Map/Standstill/")
+        self.csv_directory = os.path.expanduser("/home/supannee/Project/src/ALS_Final_Project/als_mobile_robot/result/Narmol/Standstill/iter5/")
         self.csv_filename = os.path.join(self.csv_directory, "localization_stationary_data.csv")
         self.system_usage_filename = os.path.join(self.csv_directory, "system_usage_Stationary.csv")
 

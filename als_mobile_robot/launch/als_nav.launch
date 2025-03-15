@@ -22,7 +22,7 @@
     <arg name="robot_namespace" default="/"/>
 
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
-        <arg name="world_name" value="/home/supannee/Project/src/ALS_Final_Project/als_mobile_robot/world/Narrow.world" />
+        <arg name="world_name" value="/home/supannee/Project/src/ALS_Final_Project/als_mobile_robot/world/Nomal_obstacle.world" />
         <arg name="paused" value="$(arg paused)"/>
         <arg name="use_sim_time" value="$(arg use_sim_time)"/>
         <arg name="gui" value="$(arg gui)"/>
